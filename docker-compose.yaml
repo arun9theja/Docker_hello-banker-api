@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+
+  pybanker:
+    image: wenkatn/hello-banker-api:dev-0.1
+    container_name: hello-banker-api
+    ports:
+      - '8888:8888'
