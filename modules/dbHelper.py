@@ -11,25 +11,6 @@ def dict_factory(cursor, row):
     return d
 
 
-def getAccountNames(status='all'):
-    db = sqlite3.connect(getDBPath())
-    db.row_factory = dict_factory
-    cursor = db.cursor()
-    statusquery = ""
-    if status != "all":
-        statusquery = "AND status = '%s'" % status
-    query = """
-        SELECT name, type
-        FROM accounts
-        WHERE 1 = 1 %s
-        ORDER BY type
-        """ % statusquery
-    cursor.execute(query)
-    data = cursor.fetchall()
-    db.close()
-    return jsonify(data)
-
-
 def getAccounts(account='all', status='all'):
     db = sqlite3.connect(getDBPath())
     db.row_factory = dict_factory

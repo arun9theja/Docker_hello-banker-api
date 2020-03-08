@@ -1,15 +1,7 @@
 from flask_restful import Resource
-from modules.dbHelper import getAccounts, getAccountNames
+from modules.dbHelper import getAccounts
 
 
-class AccountApi(Resource):
-    def get(self):
-        return getAccountNames()
-
-
-class AccountsDetailApi(Resource):
+class AccountsApi(Resource):
     def get(self):
         return getAccounts()
-
-if __name__ == "__main__":
-    pass
