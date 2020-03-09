@@ -30,3 +30,21 @@ def getAccounts(account='all', status='all'):
     data = cursor.fetchall()
     db.close()
     return jsonify(data)
+
+def getCategories(type='all'):
+    db = sqlite3.connect(getDBPath())
+    db.row_factory = dict_factory
+    cursor = db.cursor()
+    condquery = ""
+    if not type == "all":
+        condquery = "AND type = '%s'" % type
+    query = """
+        SELECT name, type FROM categories
+        WHERE 1 = 1 %s
+        ORDER BY type
+        """ % condquery
+    cursor.execute(query)
+    data = cursor.fetchall()
+    db.close()
+    return jsonify(data)
+
