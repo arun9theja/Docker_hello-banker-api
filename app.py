@@ -2,10 +2,12 @@ from flask import Flask, jsonify
 from datetime import datetime
 from flask_restful import Api
 from restful_resources.routes import initialize_routes
+from flask_cors import CORS
 
 # Initialize Flask Object
 app = Flask(__name__)
 api = Api(app)
+CORS(app)
 
 # Load config from file
 app.config.from_object('config')
