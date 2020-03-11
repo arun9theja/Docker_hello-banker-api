@@ -1,7 +1,7 @@
 
 # App Details
 APP_IFADDR   = '0.0.0.0'
-APP_PORT     = '8888'
+APP_PORT     = '8989'
 APP_DEBUG    = True
 APP_THREADED = True
 
