@@ -31,6 +31,7 @@ def getAccounts(account='all', status='all'):
     db.close()
     return jsonify(data)
 
+
 def getCategories(type='all'):
     db = sqlite3.connect(getDBPath())
     db.row_factory = dict_factory
@@ -48,6 +49,7 @@ def getCategories(type='all'):
     db.close()
     return jsonify(data)
 
+
 def getDistinctAccountTypes():
     db = sqlite3.connect(getDBPath())
     db.row_factory = dict_factory
@@ -61,6 +63,7 @@ def getDistinctAccountTypes():
     data = cursor.fetchall()
     db.close()
     return jsonify(data)
+
 
 def getTransactions(accountname, period=None, year=None, month=None):
     db = sqlite3.connect(getDBPath())
@@ -93,3 +96,80 @@ def getTransactions(accountname, period=None, year=None, month=None):
     data = cursor.fetchall()
     db.close()
     return jsonify(data)
+
+
+def addTransactionsDB(date, notes, amount, category, account):
+    db = sqlite3.connect(getDBPath())
+    cursor = db.cursor()
+
+    credit, debit, updatetype = ["NULL", amount, "debit"]
+    if getCategoryType(category) == "IN":
+        credit, debit, updatetype = [amount, "NULL", "credit"]
+
+    query = """
+        INSERT INTO transactions 
+        VALUES('%s', '%s', '%s', %s, %s, '%s')""" % (date, notes, category,
+                                                     credit, debit, account)
+    cursor.execute(query)
+    data = cursor.fetchall()
+    db.commit()
+    db.close()
+    if len(data) == 0:
+        if updateAccounts(account, amount, updatetype):
+            returnString = {"status": "Transaction added successfully"}
+        else:
+            returnString = {
+                "status":
+                "Failed to update accounts table. But transaction recorded"
+            }
+    else:
+        returnString = {"status": str(data[0])}
+
+    return jsonify(returnString)
+
+
+def getCategoryType(category):
+    db = sqlite3.connect(getDBPath())
+    cursor = db.cursor()
+
+    query = "SELECT type FROM categories WHERE name = '%s'" % category
+    cursor.execute(query)
+    data = cursor.fetchone()
+    db.close()
+    return data[0]
+
+
+def updateAccounts(name, amount, updatetype):
+    db = sqlite3.connect(getDBPath())
+    cursor = db.cursor()
+
+    sign, operator = ["+", "-"]
+    isassetAcc = checkAccountType(name)
+    if not isassetAcc:
+        sign = "-"
+    if updatetype == "credit":
+        operator = "+"
+
+    query = """UPDATE accounts
+            SET balance = balance %s %s%s, lastoperated = DATE('NOW')
+            WHERE name = '%s'""" % (operator, sign, amount, name)
+    cursor.execute(query)
+    db.commit()
+    db.close()
+    return True
+
+
+def checkAccountType(account):
+    db = sqlite3.connect(getDBPath())
+    cursor = db.cursor()
+    isassetAcc = True
+
+    query = "SELECT type FROM accounts WHERE name = '%s'" % account
+    cursor.execute(query)
+    data = cursor.fetchone()
+
+    db.close()
+
+    if data[0] == "Credit Card":
+        isassetAcc = False
+    return isassetAcc
