@@ -98,6 +98,12 @@ def getTransactions(accountname, period=None, year=None, month=None):
     return jsonify(data)
 
 
+def fundTransferDB(date, notes, amount, fromAccount, toAccount):
+    addTransactionsDB(date, notes, amount, "TRANSFER OUT", fromAccount)
+    addTransactionsDB(date, notes, amount, "TRANSFER IN", toAccount)
+    return jsonify({"status": "Funds Transfered successfully"})
+
+
 def addTransactionsDB(date, notes, amount, category, account):
     db = sqlite3.connect(getDBPath())
     cursor = db.cursor()
