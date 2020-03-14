@@ -205,7 +205,7 @@ def getMonthStats(month=None):
     return jsonify(data)
 
 
-def getDescriptionSuggestions(keyword, limit=10):
+def getDescriptionSuggestions(keyword, type="regular", limit=10):
     db = sqlite3.connect(getDBPath())
     db.row_factory = dict_factory
     cursor = db.cursor()
@@ -216,6 +216,15 @@ def getDescriptionSuggestions(keyword, limit=10):
         WHERE description LIKE '%%%s%%'
         ORDER BY opdate DESC LIMIT %d
         """ % (keyword, limit)
+    
+    if not "regular" in type:
+        query = """
+            SELECT DISTINCT(description) AS description 
+            FROM transactions 
+            WHERE description LIKE '%%%s%%'
+                AND category IN ('TRANSFER IN', 'TRANSFER OUT')
+            ORDER BY opdate DESC LIMIT %d
+            """ % (keyword, limit)
 
     cursor.execute(query)
     data = cursor.fetchall()

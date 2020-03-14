@@ -36,4 +36,5 @@ class FundTransactionsApi(Resource):
 class GetDescriptionSuggestionsApi(Resource):
     def get(self):
         keyword = request.args.get("keyword", default=None)
-        return getDescriptionSuggestions(keyword)
+        type = request.args.get("type", default="regular")
+        return getDescriptionSuggestions(keyword, type)
