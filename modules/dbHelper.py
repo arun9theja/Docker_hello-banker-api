@@ -180,6 +180,7 @@ def checkAccountType(account):
         isassetAcc = False
     return isassetAcc
 
+
 def getMonthStats(month=None):
     db = sqlite3.connect(getDBPath())
     db.row_factory = dict_factory
@@ -201,4 +202,22 @@ def getMonthStats(month=None):
     cursor.execute(query)
     data = cursor.fetchall()
     db.close()
-    return jsonify(data)       
+    return jsonify(data)
+
+
+def getDescriptionSuggestions(keyword, limit=10):
+    db = sqlite3.connect(getDBPath())
+    db.row_factory = dict_factory
+    cursor = db.cursor()
+
+    query = """
+        SELECT DISTINCT(description) AS description 
+        FROM transactions 
+        WHERE description LIKE '%%%s%%'
+        ORDER BY opdate DESC LIMIT %d
+        """ % (keyword, limit)
+
+    cursor.execute(query)
+    data = cursor.fetchall()
+    db.close()
+    return jsonify(data)

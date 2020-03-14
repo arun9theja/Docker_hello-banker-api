@@ -1,6 +1,6 @@
 from flask import request
 from flask_restful import Resource
-from modules.dbHelper import getTransactions, addTransactionsDB, fundTransferDB
+from modules.dbHelper import getTransactions, addTransactionsDB, fundTransferDB, getDescriptionSuggestions
 
 
 class TransactionsListApi(Resource):
@@ -32,3 +32,8 @@ class FundTransactionsApi(Resource):
         fromAccount = json_data["fromAccount"]
         toAccount = json_data["toAccount"]
         return fundTransferDB(date, notes, amount, fromAccount, toAccount)
+
+class GetDescriptionSuggestionsApi(Resource):
+    def get(self):
+        keyword = request.args.get("keyword", default=None)
+        return getDescriptionSuggestions(keyword)
