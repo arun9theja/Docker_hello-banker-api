@@ -179,3 +179,26 @@ def checkAccountType(account):
     if data[0] == "Credit Card":
         isassetAcc = False
     return isassetAcc
+
+def getMonthStats(month=None):
+    db = sqlite3.connect(getDBPath())
+    db.row_factory = dict_factory
+    cursor = db.cursor()
+
+    advQuery = "AND opdate >= DATE('NOW', 'START OF MONTH')"
+
+    if not month is None:
+        advQuery = "AND opdate BETWEEN DATE('NOW', 'START OF MONTH', '-1 MONTH') AND DATE('NOW', 'START OF MONTH')"
+
+    query = """
+        SELECT category, SUM(debit) AS debit, SUM(credit) AS credit
+        FROM transactions
+        WHERE category NOT IN ('TRANSFER IN', 'TRANSFER OUT') %s
+        GROUP BY category
+        ORDER BY debit DESC, credit DESC
+        """ % advQuery
+
+    cursor.execute(query)
+    data = cursor.fetchall()
+    db.close()
+    return jsonify(data)       

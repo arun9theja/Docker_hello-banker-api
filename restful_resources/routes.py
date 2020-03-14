@@ -1,5 +1,6 @@
 from restful_resources.account import AccountsApi, DistinctAccountTypesApi
 from restful_resources.categories import CategoriesApi
+from restful_resources.stats import MonthStatsApi
 from restful_resources.transactions import TransactionsListApi, AddTransactionApi, FundTransactionsApi
 
 
@@ -10,3 +11,4 @@ def initialize_routes(api):
     api.add_resource(TransactionsListApi, '/api/listtransactions')
     api.add_resource(AddTransactionApi, '/api/addtransaction')
     api.add_resource(FundTransactionsApi, '/api/fundtransfer')
+    api.add_resource(MonthStatsApi, '/api/monthstats')
