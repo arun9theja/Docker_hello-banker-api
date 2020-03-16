@@ -11,7 +11,7 @@ def dict_factory(cursor, row):
     return d
 
 
-def getAccounts(account='all', status='all'):
+def getAccounts(account='all', status='all', output="json"):
     db = sqlite3.connect(getDBPath())
     db.row_factory = dict_factory
     cursor = db.cursor()
@@ -29,7 +29,18 @@ def getAccounts(account='all', status='all'):
     cursor.execute(query)
     data = cursor.fetchall()
     db.close()
+    if output is None:
+        return data
     return jsonify(data)
+
+
+def getIgnoredAccounts():
+    ignoreAccounts = []
+    accounts = getAccounts(output=None)
+    for account in accounts:
+        if account['excludetotal'] == 'yes':
+            ignoreAccounts.append('"%s"' % account['name'])
+    return ",".join(ignoreAccounts)
 
 
 def getCategories(type='all'):
@@ -216,7 +227,7 @@ def getDescriptionSuggestions(keyword, type="regular", limit=10):
         WHERE description LIKE '%%%s%%'
         ORDER BY opdate DESC LIMIT %d
         """ % (keyword, limit)
-    
+
     if not "regular" in type:
         query = """
             SELECT DISTINCT(description) AS description 
@@ -230,3 +241,31 @@ def getDescriptionSuggestions(keyword, type="regular", limit=10):
     data = cursor.fetchall()
     db.close()
     return jsonify(data)
+
+
+def getCategoryStats(category, period):
+    db = sqlite3.connect(getDBPath())
+    db.row_factory = dict_factory
+    cursor = db.cursor()
+    optype = "debit"
+    opdateFormat = ""
+    if getCategoryType(category) == "IN":
+        optype = "credit"
+    if period == 'YEAR_MONTH':
+        opdateFormat = "STRFTIME('%Y%m', opdate)"
+    else:
+        opdateFormat = "STRFTIME('%Y', opdate)"
+
+    query = """
+            SELECT {0} AS x, SUM({1}) AS y
+            FROM transactions
+            WHERE category = '{2}'
+                AND account NOT IN ({3})
+                AND category NOT IN ('TRANSFER IN','TRANSFER OUT')
+            GROUP BY x
+            ORDER BY x
+            """.format(opdateFormat, optype, category, getIgnoredAccounts())
+    cursor.execute(query)
+    data = cursor.fetchall()
+    db.close()
+    return data
