@@ -272,6 +272,7 @@ def getCategoryStats(category, period):
     db.close()
     return data
 
+
 def getDetailedCategoryStats(data, period="YEAR_MONTH"):
     if data is None:
         return None
@@ -282,14 +283,25 @@ def getDetailedCategoryStats(data, period="YEAR_MONTH"):
         periodAvg = "%.2f" % periodAvg
         sortedData = sorted(data, key=itemgetter("y"))
         if period == "YEAR_MONTH":
-            lowestPeriod = "%s %s" % (
-                calendar.month_name[int(sortedData[0]["x"]) % 100], str(sortedData[0]["x"])[:-2])
-            highestPeriod = "%s %s" % (
-                calendar.month_name[int(sortedData[-1]["x"]) % 100], str(sortedData[-1]["x"])[:-2])
+            lowestPeriod = "%s %s" % (calendar.month_name[int(
+                sortedData[0]["x"]) % 100], str(sortedData[0]["x"])[:-2])
+            highestPeriod = "%s %s" % (calendar.month_name[int(
+                sortedData[-1]["x"]) % 100], str(sortedData[-1]["x"])[:-2])
         else:
             lowestPeriod = sortedData[0]["x"]
             highestPeriod = sortedData[-1]["x"]
-        lowest = [{"period": lowestPeriod, "value": "%.2f" % sortedData[0]["y"]}]
-        highest = [{"period": highestPeriod, "value" : "%.2f" % sortedData[-1]["y"]}]
-        categoryStatsData = [{"total": totalSpent}, {"average": periodAvg}, {"highest": highest}, {"lowest": lowest}]
+        lowest = {
+            "period": lowestPeriod,
+            "value": "%.2f" % sortedData[0]["y"]
+        }
+        highest = {
+            "period": highestPeriod,
+            "value": "%.2f" % sortedData[-1]["y"]
+        }
+        categoryStatsData = {
+            "total": totalSpent,
+            "average": periodAvg,
+            "highest": highest,
+            "lowest": lowest
+        }
         return categoryStatsData
