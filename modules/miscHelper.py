@@ -9,8 +9,18 @@ def getDBPath():
 
 
 def categoryStats(category):
-    from modules.dbHelper import getCategoryStats
+    from modules.dbHelper import getCategoryStats, getDetailedCategoryStats
     year_month_data = getCategoryStats(category, period="YEAR_MONTH")
     year_data = getCategoryStats(category, period="YEAR")
-    finalStats = [{"year_month_data": year_month_data}, {"year_data": year_data}]
+    year_month_stats = getDetailedCategoryStats(year_month_data, period="YEAR_MONTH")
+    year_stats = getDetailedCategoryStats(year_data, period="YEAR")
+    finalStats = [{
+        "year_month_data": year_month_data
+    }, {
+        "year_data": year_data
+    }, {
+        "year_month_stats": year_month_stats
+    }, {
+        "year_stats": year_stats
+    }]
     return jsonify(finalStats)
