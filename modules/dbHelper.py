@@ -315,7 +315,7 @@ def getInEx(type, period):
 
     if "monthly" in period:
         query = """
-            SELECT STRFTIME('%Y%m', opdate) AS x, SUM({0}) AS y
+            SELECT STRFTIME('%Y%m', opdate) AS x, ROUND(SUM({0})) AS y
             FROM transactions
             WHERE account NOT IN ({1})
                 AND category NOT IN ('OPENING BALANCE','TRANSFER IN','TRANSFER OUT')
@@ -324,7 +324,7 @@ def getInEx(type, period):
             """.format(optype, getIgnoredAccounts())
     else:
         query = """
-                SELECT STRFTIME('%Y', opdate) AS x, SUM({0}) AS y
+                SELECT STRFTIME('%Y', opdate) AS x, ROUND(SUM({0})) AS y
                 FROM transactions
                 WHERE account NOT IN ({1})
                     AND category NOT IN ('OPENING BALANCE','TRANSFER IN','TRANSFER OUT')
