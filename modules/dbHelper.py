@@ -259,7 +259,7 @@ def getCategoryStats(category, period):
         opdateFormat = "STRFTIME('%Y', opdate)"
 
     query = """
-            SELECT {0} AS x, SUM({1}) AS y
+            SELECT {0} AS x, ROUND(SUM({1})) AS y
             FROM transactions
             WHERE category = '{2}'
                 AND account NOT IN ({3})
@@ -279,7 +279,7 @@ def getDetailedCategoryStats(data, period="YEAR_MONTH"):
     else:
         totalSpent = sum(item["y"] for item in data)
         totalSpent = "%.2f" % totalSpent
-        periodAvg = float(totalSpent) / float(len(data))
+        periodAvg = round(float(totalSpent) / float(len(data)))
         periodAvg = "%.2f" % periodAvg
         sortedData = sorted(data, key=itemgetter("y"))
         if period == "YEAR_MONTH":
