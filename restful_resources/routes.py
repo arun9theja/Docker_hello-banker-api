@@ -1,6 +1,6 @@
 from restful_resources.account import AccountsApi, DistinctAccountTypesApi
 from restful_resources.categories import CategoriesApi, CategoryStatsApi
-from restful_resources.stats import MonthStatsApi
+from restful_resources.stats import MonthStatsApi, InExStatsApi
 from restful_resources.transactions import TransactionsListApi, AddTransactionApi, FundTransactionsApi, GetDescriptionSuggestionsApi
 
 
@@ -14,3 +14,4 @@ def initialize_routes(api):
     api.add_resource(MonthStatsApi, '/api/monthstats')
     api.add_resource(GetDescriptionSuggestionsApi, '/api/descriptionsuggestions')
     api.add_resource(CategoryStatsApi, '/api/categorystats')
+    api.add_resource(InExStatsApi, '/api/inexstats')

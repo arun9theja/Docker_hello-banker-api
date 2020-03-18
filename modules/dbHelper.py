@@ -290,10 +290,7 @@ def getDetailedCategoryStats(data, period="YEAR_MONTH"):
         else:
             lowestPeriod = sortedData[0]["x"]
             highestPeriod = sortedData[-1]["x"]
-        lowest = {
-            "period": lowestPeriod,
-            "value": "%.2f" % sortedData[0]["y"]
-        }
+        lowest = {"period": lowestPeriod, "value": "%.2f" % sortedData[0]["y"]}
         highest = {
             "period": highestPeriod,
             "value": "%.2f" % sortedData[-1]["y"]
@@ -305,3 +302,37 @@ def getDetailedCategoryStats(data, period="YEAR_MONTH"):
             "lowest": lowest
         }
         return categoryStatsData
+
+
+def getInEx(type, period):
+    db = sqlite3.connect(getDBPath())
+    db.row_factory = dict_factory
+    cursor = db.cursor()
+
+    optype = "debit" if type == "expense" else "credit"
+
+    query = ""
+
+    if "monthly" in period:
+        query = """
+            SELECT STRFTIME('%Y%m', opdate) AS x, SUM({0}) AS y
+            FROM transactions
+            WHERE account NOT IN ({1})
+                AND category NOT IN ('OPENING BALANCE','TRANSFER IN','TRANSFER OUT')
+            GROUP BY x
+            ORDER BY x
+            """.format(optype, getIgnoredAccounts())
+    else:
+        query = """
+                SELECT STRFTIME('%Y', opdate) AS x, SUM({0}) AS y
+                FROM transactions
+                WHERE account NOT IN ({1})
+                    AND category NOT IN ('OPENING BALANCE','TRANSFER IN','TRANSFER OUT')
+                GROUP BY x
+                ORDER BY x
+                """.format(optype, getIgnoredAccounts())
+
+    cursor.execute(query)
+    data = cursor.fetchall()
+    db.close()
+    return data
