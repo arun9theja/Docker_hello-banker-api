@@ -3,7 +3,7 @@ version: "3.5"
 services:
 
   hello-banker-api:
-    image: wenkatn/hello-banker-api:dev-0.2
+    image: wenkatn/hello-banker-api:latest
     container_name: hello-banker-api
     ports:
       - '8989:8989'
@@ -11,10 +11,10 @@ services:
       - hello-banker
     
   hello-banker-web:
-    image: wenkatn/hello-banker-web:dev-0.2
+    image: wenkatn/hello-banker-web:latest
     container_name: hello-banker-web
     ports:
-      - '3000:80'
+      - '8988:80'
     depends_on:
       - hello-banker-api
     networks:
